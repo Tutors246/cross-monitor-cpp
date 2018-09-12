@@ -1,0 +1,48 @@
+i
+---------------
+The following questions are designed to evaluate the skills required for this role. Please read the instructions for each question and submit your responses.
+All Questions are mandatory.
+Make sure to answer all 6 questions before submission. <Go to first question>
+
+Q1
+---------------
+We have prepared a project assessment. If you are using Windows, download the Visual Studio 2015 project from <this link>. If you are using Mac, download the Xcode project from <this link>. Review the Readme file with instructions on how to proceed.
+Once completed, please zip the project and store it in a shared location where the Crossover team can access and download the project for evaluation. Please add your link to the shared file in the text box below.
+
+Q2
+---------------
+How will you create the CI/CD process for this application? Propose the tools, technologies required to achieve CI/CD in general.
+
+Q3
+---------------
+How can you improve the code quality and maintainability of this project? What are alternative libraries or frameworks you can use for testing and measuring code quality?
+
+Q4
+---------------
+Describe one hard technical problem you faced in your last major project.
+
+Please describe:
+    What were the problem and the impact of it?
+    What were the solutions considered and final choice?
+    What was the outcome?
+    What did you learn from solving this problem and what would you re-use in your future projects?
+
+Q5
+---------------
+CrossMonitor.Client application extended to send statistics to the server over HTTP, but the customer requested a new feature where the server can get system information at any given time from each CrossMonitor.Client. How will you implement this new requirement?
+
+Q6
+---------------
+CCAT Test
+
+Please use the below link to complete the CCAT Test which is also mandatory in order to be considered for the final interview stage. Make sure you use your same name/email used to apply for this position. We will automatically look up your CCAT scores using this email address so it is vital the email addresses match.
+
+http://www.ondemandassessment.com/verify/apply/eBDeDmS/DhnwEbnT
+
+IMPORTANT: If you’ve already taken CCAT with Crossover using the same email address, there is no need to retake the CCAT. However, if your last application was earlier than 90 days ago, you can still retake the test.
+
+Criteria Cognitive Aptitude Test
+
+The CCAT measures cognitive aptitude, or general intelligence. This test provides an indication of a subject’s ability to solve problems, digest and apply information, learn new skills, and think critically. Cognitive aptitude is one of the most accurate job predictors of job success for any position.
+
+In the space below, you may enter anything you like to submit the test.
