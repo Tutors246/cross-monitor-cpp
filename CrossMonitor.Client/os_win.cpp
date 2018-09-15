@@ -99,33 +99,76 @@ float memory_use_percent() noexcept {
 }
 
 uint64_t io_usage() noexcept {
-	PDH_BROWSE_DLG_CONFIG config;
-	memset(&config, 0, sizeof(config));
-	config.bDisableMachineSelection = false;
-	config.bHideDetailBox = false;
-	config.bIncludeCostlyObjects = true;
-	config.bIncludeInstanceIndex = true;
-	config.bInitializePath = true;
-	config.bLocalCountersOnly = false;
-	config.bShowObjectBrowser = true;
-	config.bSingleCounterPerAdd = false;
-	config.bSingleCounterPerDialog = false;
-	try
-	{
-		PdhBrowseCounters(&config);
-	}
-	catch (const std::exception& e)
-	{
-		LOG(error) << "exception was thrown" << e.what();
-	}
+	static PDH_HQUERY query;
+	static PDH_HCOUNTER cpu_counter;
 
-	IO_COUNTERS io_counters;
-	if (!GetProcessIoCounters(NULL, &io_counters)) {
-		LOG(error) << "Failed to get i/o info, code: " << GetLastError();
+	static once_flag onceflag;
+	call_once(onceflag, []() {
+		PdhOpenQuery(NULL, NULL, &query);
+		PdhAddEnglishCounter(query,
+			L"\\LogicalDisk(_Total)\\Disk Transfers/sec",
+			NULL,
+			&cpu_counter);
+		PdhCollectQueryData(query);
+	});
+
+	static mutex m;
+	const lock_guard<mutex> guard(m);
+
+	PDH_FMT_COUNTERVALUE value;
+	PDH_STATUS status;
+	if ((status = PdhCollectQueryData(query)) != ERROR_SUCCESS) {
+		LOG(error) << "Error collecting CPU usage data, code: " << status;
 		return 0;
 	}
-	//return io_counters.ReadOperationCount + io_counters.WriteOperationCount;
-	return io_counters.ReadTransferCount + io_counters.WriteTransferCount;
+	if ((status = PdhGetFormattedCounterValue(cpu_counter,
+		PDH_FMT_DOUBLE,
+		NULL,
+		&value)) != ERROR_SUCCESS) {
+		LOG(error) << "Error formatting CPU usage data, code: " << status;
+		return 0;
+	}
+	return static_cast<uint64_t>(value.doubleValue);
+
+
+	PDH_STATUS                pdhStatus;
+	PDH_BROWSE_DLG_CONFIG    oPDHBrowseDialogCfg;
+	TCHAR                    sBuffer[PDH_MAX_COUNTER_PATH + 1];
+
+	// Zero memory structures
+	ZeroMemory(&oPDHBrowseDialogCfg, sizeof(PDH_BROWSE_DLG_CONFIG));
+
+	// Initialize the path buffer
+	ZeroMemory(&sBuffer, sizeof(sBuffer));
+	//_tcscpy_s (sBuffer, PDH_MAX_COUNTER_PATH + 1, m_sCounterPath);
+
+	// Initialize the browser dialog window settings
+	oPDHBrowseDialogCfg.bIncludeInstanceIndex = FALSE;
+	oPDHBrowseDialogCfg.bSingleCounterPerAdd = TRUE;
+	oPDHBrowseDialogCfg.bSingleCounterPerDialog = TRUE;
+	oPDHBrowseDialogCfg.bLocalCountersOnly = FALSE;
+	oPDHBrowseDialogCfg.bWildCardInstances = TRUE;
+	oPDHBrowseDialogCfg.bHideDetailBox = TRUE;
+	oPDHBrowseDialogCfg.bInitializePath = FALSE;
+	oPDHBrowseDialogCfg.bDisableMachineSelection = FALSE;
+	oPDHBrowseDialogCfg.bIncludeCostlyObjects = FALSE;
+	oPDHBrowseDialogCfg.bShowObjectBrowser = FALSE;
+	oPDHBrowseDialogCfg.hWndOwner = NULL;// m_hWnd;
+	oPDHBrowseDialogCfg.szReturnPathBuffer = sBuffer;
+	oPDHBrowseDialogCfg.cchReturnPathLength = sizeof(sBuffer) / sizeof(TCHAR);
+	oPDHBrowseDialogCfg.pCallBack = NULL;
+	oPDHBrowseDialogCfg.dwCallBackArg = 0;
+	oPDHBrowseDialogCfg.CallBackStatus = ERROR_SUCCESS;
+	oPDHBrowseDialogCfg.dwDefaultDetailLevel = PERF_DETAIL_WIZARD;
+	oPDHBrowseDialogCfg.szDialogBoxCaption = TEXT("Select a counter for DiskLED");
+
+	// Display the counter browser window. The dialog is configured
+	// to return a single selection from the counter list.
+	pdhStatus = PdhBrowseCounters(&oPDHBrowseDialogCfg);
+	if (pdhStatus == ERROR_SUCCESS)
+	{
+		LOG(info) << "Path = " << sBuffer;
+	}
 }
 
 } //namespace os
