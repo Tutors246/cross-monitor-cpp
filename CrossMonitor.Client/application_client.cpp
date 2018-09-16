@@ -27,7 +27,7 @@ static data collect_data() {
 		os::cpu_use_percent(),
 		os::memory_use_percent(),
 		os::process_count(),
-		os::io_usage()
+		os::io_use_percent()
 	};
 }
 
@@ -38,7 +38,7 @@ static web::json::value data_to_json(const data& data) noexcept {
 	o[L"cpu_percent"] = data.get_cpu_percent();
 	o[L"memory_percent"] = data.get_memory_percent();
 	o[L"process_count"] = data.get_process_count();
-	o[L"io_usage"] = data.get_io_usage();
+	o[L"io_percent"] = data.get_io_percent();
 	return v;
 }
 
@@ -67,7 +67,7 @@ static void send_data(const string& url, const string& key, const data& data) {
 static void report_sent_callback(const data& sent_data)
 {
 	static unsigned reports_sent = 0;
-	static float latest_cpu_values[10] = { 0 };
+	static int latest_cpu_values[10] = { 0 };
 	static mutex m;
 
 	lock_guard<mutex> l(m);

@@ -14,15 +14,15 @@ unsigned process_count() noexcept;
 /**
  * Gets CPU use percentage (0 to 100).
  */
-float cpu_use_percent() noexcept;
+int cpu_use_percent() noexcept;
 /**
  * Gets physical memory use percentage (0 to 100).
  */
-float memory_use_percent() noexcept;
+int memory_use_percent() noexcept;
 /**
 * Gets io usage.
 */
-uint64_t io_usage() noexcept;
+int io_use_percent() noexcept;
 
 } //namespace os
 } //namespace client
