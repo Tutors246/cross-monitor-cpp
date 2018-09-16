@@ -1,0 +1,5 @@
+to have a better code, i suggest the following:
+
+1. a unique_ptr is used with a deleter not to worry about memory leaks or deletion of a pointer. pimpl_ in class application has no deleter and in the desctructor
+   it has been deleted manually. so the use of unique_ptr in this case makes no sense.
+
