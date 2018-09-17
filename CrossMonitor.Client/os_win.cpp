@@ -100,7 +100,7 @@ int memory_use_percent() noexcept {
 
 int io_use_percent() noexcept {
 	static PDH_HQUERY query;
-	static PDH_HCOUNTER cpu_counter;
+	static PDH_HCOUNTER io_counter;
 
 	static once_flag onceflag;
 	call_once(onceflag, []() {
@@ -108,7 +108,7 @@ int io_use_percent() noexcept {
 		PdhAddEnglishCounter(query,
 			L"\\PhysicalDisk(_Total)\\% Disk Time",
 			NULL,
-			&cpu_counter);
+			&io_counter);
 		PdhCollectQueryData(query);
 	});
 
@@ -118,14 +118,14 @@ int io_use_percent() noexcept {
 	PDH_FMT_COUNTERVALUE value;
 	PDH_STATUS status;
 	if ((status = PdhCollectQueryData(query)) != ERROR_SUCCESS) {
-		LOG(error) << "Error collecting CPU usage data, code: " << status;
+		LOG(error) << "Error collecting IO usage data, code: " << status;
 		return 0;
 	}
-	if ((status = PdhGetFormattedCounterValue(cpu_counter,
+	if ((status = PdhGetFormattedCounterValue(io_counter,
 		PDH_FMT_DOUBLE,
 		NULL,
 		&value)) != ERROR_SUCCESS) {
-		LOG(error) << "Error formatting CPU usage data, code: " << status;
+		LOG(error) << "Error formatting IO usage data, code: " << status;
 		return 0;
 	}
 	return static_cast<int>(value.doubleValue);
